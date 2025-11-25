@@ -1,0 +1,50 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Premium gradient definitions -->
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0099ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.4" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Geometric symbol - stylized "A" with dynamic elements -->
+  <g filter="url(#glow)">
+    <!-- Main triangle -->
+    <path d="M 20 45 L 35 15 L 50 45 Z" fill="url(#logoGradient)" stroke="url(#accentGradient)" stroke-width="1.5"/>
+    
+    <!-- Inner dynamic lines -->
+    <line x1="27" y1="35" x2="43" y2="35" stroke="#00ffff" stroke-width="2" opacity="0.9"/>
+    <line x1="29" y1="40" x2="41" y2="40" stroke="#00d4ff" stroke-width="1.5" opacity="0.7"/>
+    
+    <!-- Orbital elements -->
+    <circle cx="35" cy="20" r="3" fill="#00ffff" opacity="0.8"/>
+    <circle cx="35" cy="30" r="2" fill="#0099ff" opacity="0.6"/>
+    
+    <!-- Dynamic arc -->
+    <path d="M 22 42 Q 35 38 48 42" stroke="url(#accentGradient)" stroke-width="1.5" fill="none" opacity="0.7"/>
+  </g>
+  
+  <!-- Company name -->
+  <text x="60" y="32" font-family="'Arial', 'Helvetica', sans-serif" font-size="20" font-weight="700" fill="url(#logoGradient)">
+    AXIOM
+  </text>
+  <text x="60" y="48" font-family="'Arial', 'Helvetica', sans-serif" font-size="14" font-weight="400" fill="#00d4ff" opacity="0.9">
+    DYNAMICS
+  </text>
+  
+  <!-- Accent line -->
+  <line x1="60" y1="35" x2="148" y2="35" stroke="url(#accentGradient)" stroke-width="0.5" opacity="0.5"/>
+</svg>
+
