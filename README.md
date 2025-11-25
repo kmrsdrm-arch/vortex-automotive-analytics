@@ -4,6 +4,21 @@
 
 A comprehensive analytics platform combining FastAPI backend, Streamlit dashboard, PostgreSQL database, and OpenAI integration for intelligent insights.
 
+## 📚 **NEW**: Comprehensive Code Documentation
+
+> **This codebase is now extensively documented with 3,450+ lines of detailed comments and explanations!**
+> 
+> Every major file includes:
+> - ✅ **What** it does and **why** it exists
+> - ✅ **How** it works internally
+> - ✅ **Real-world examples** and use cases
+> - ✅ **Best practices** and anti-patterns
+> - ✅ **Beginner-friendly** explanations
+>
+> **Perfect for learning**: The code teaches Python, FastAPI, SQLAlchemy, and web development best practices.
+>
+> 📖 **See** [`REFACTORING_NOTES.md`](./REFACTORING_NOTES.md) for complete documentation overview.
+
 ---
 
 ## 🚀 Quick Start
