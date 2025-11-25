@@ -1,15 +1,26 @@
 """Raw data access endpoints."""
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
+from pydantic import BaseModel
 
 from src.api.dependencies import get_db
 from src.database.repositories.vehicle_repo import VehicleRepository
 from src.database.repositories.sales_repo import SalesRepository
 from src.database.repositories.inventory_repo import InventoryRepository
+from src.data_generation.synthetic_data import SyntheticDataGenerator
+from src.data_generation.seeder import DatabaseSeeder
+from config.logging_config import logger
 
 router = APIRouter(prefix="/api/v1/data", tags=["Data"])
+
+
+class SeedRequest(BaseModel):
+    """Request model for database seeding."""
+    num_vehicles: int = 100
+    num_sales: int = 10000
+    months_back: int = 24
 
 
 @router.get("/vehicles")
@@ -120,4 +131,51 @@ async def get_inventory(
         }
         for i in inventory[:limit]
     ]
+
+
+@router.post("/seed")
+async def seed_database(
+    seed_request: SeedRequest = SeedRequest(),
+    db: Session = Depends(get_db)
+):
+    """
+    Seed the database with synthetic data.
+    
+    This endpoint generates synthetic vehicles, sales transactions, and inventory records.
+    Useful for testing and development purposes.
+    
+    Parameters:
+    - num_vehicles: Number of vehicles to generate (default: 100)
+    - num_sales: Number of sales transactions to generate (default: 10000)
+    - months_back: How many months of historical data to generate (default: 24)
+    """
+    try:
+        logger.info("Starting database seeding via API...")
+        
+        # Create generator and seeder
+        generator = SyntheticDataGenerator(seed=42)
+        seeder = DatabaseSeeder(db, generator)
+        
+        # Seed all data
+        summary = seeder.seed_all(
+            num_vehicles=seed_request.num_vehicles,
+            num_sales=seed_request.num_sales,
+            months_back=seed_request.months_back
+        )
+        
+        logger.info("Database seeding completed successfully via API!")
+        
+        return {
+            "success": True,
+            "message": "Database seeded successfully",
+            "summary": {
+                "vehicles": summary['vehicles'],
+                "inventory_records": summary['inventory'],
+                "sales_transactions": summary['sales']
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error seeding database via API: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to seed database: {str(e)}")
 

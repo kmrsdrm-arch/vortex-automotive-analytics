@@ -37,11 +37,13 @@ st.markdown("""
 
 # Initialize API client
 if "api_client" not in st.session_state:
-    # Get API URL from environment variable or Streamlit secrets
+    # Get API URL from Streamlit secrets first, then environment variable, then default
     # Priority: st.secrets > os.getenv > default localhost
     try:
-        api_url = st.secrets.get("API_URL", os.getenv("API_URL", "http://localhost:8000"))
-    except:
+        # Access Streamlit secrets using dictionary syntax (not .get())
+        api_url = st.secrets["API_URL"]
+    except (KeyError, FileNotFoundError, AttributeError):
+        # Fall back to environment variable or default
         api_url = os.getenv("API_URL", "http://localhost:8000")
     
     st.session_state.api_client = APIClient(base_url=api_url)
@@ -130,6 +132,30 @@ with st.sidebar:
     days_selected = (end_date - start_date).days + 1
     st.caption(f"📊 Selected: {days_selected} days")
 
+    st.markdown("---")
+    
+    # Debug/Connection Info
+    with st.expander("🔍 Connection Info", expanded=False):
+        st.caption(f"**API URL:**")
+        st.code(st.session_state.api_url, language=None)
+        
+        if st.button("🔄 Test Connection", key="sidebar_test"):
+            with st.spinner("Testing..."):
+                import requests
+                try:
+                    response = requests.get(f"{st.session_state.api_url}/health", timeout=10)
+                    if response.status_code == 200:
+                        st.success("✅ Connected!")
+                        st.json(response.json())
+                    else:
+                        st.error(f"❌ Status: {response.status_code}")
+                except requests.exceptions.Timeout:
+                    st.warning("⏱️ Timeout - API may be sleeping")
+                except requests.exceptions.ConnectionError:
+                    st.error("🔌 Cannot connect")
+                except Exception as e:
+                    st.error(f"⚠️ {str(e)}")
+    
     st.markdown("---")
     st.caption("⚡ Vortex v2.0")
     st.caption("🚗 Automotive Intelligence")
