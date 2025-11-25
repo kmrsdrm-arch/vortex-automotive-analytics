@@ -17,11 +17,23 @@ class APIClient:
         """Make HTTP request."""
         url = f"{self.base_url}{endpoint}"
         try:
-            response = requests.request(method, url, **kwargs)
+            response = requests.request(method, url, timeout=30, **kwargs)
             response.raise_for_status()
             return response.json()
+        except requests.exceptions.Timeout:
+            print(f"⏱️ Timeout: API took too long to respond at {url}")
+            print("💡 Tip: Free tier APIs sleep after inactivity. Try again in 30 seconds.")
+            return None
+        except requests.exceptions.ConnectionError:
+            print(f"🔌 Connection Error: Cannot reach API at {url}")
+            print("💡 Tip: Check if API_URL is set correctly in Streamlit Secrets.")
+            return None
+        except requests.exceptions.HTTPError as e:
+            print(f"❌ HTTP Error {e.response.status_code}: {url}")
+            print(f"   Response: {e.response.text[:200]}")
+            return None
         except Exception as e:
-            print(f"Error making request to {url}: {e}")
+            print(f"⚠️ Error making request to {url}: {e}")
             return None
 
     # Analytics endpoints
