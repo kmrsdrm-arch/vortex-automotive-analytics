@@ -290,3 +290,31 @@ Best Practices:
 ✅ Set appropriate timeout limits
 ✅ Cache expensive computations
 """
+
+import sys
+import os
+
+# ===================================================================================
+# PYTHON PATH CONFIGURATION
+# ===================================================================================
+
+# Get the absolute path to project root (one level up from api/ folder)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Add project root to Python's import search path
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# ===================================================================================
+# IMPORT FASTAPI APPLICATION
+# ===================================================================================
+
+# Import the main FastAPI application from src/api/main.py
+from src.api.main import app
+
+# ===================================================================================
+# VERCEL HANDLER EXPORT
+# ===================================================================================
+
+# Vercel's Python runtime looks for 'app' or 'handler' variable
+handler = app
