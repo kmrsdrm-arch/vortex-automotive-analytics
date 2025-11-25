@@ -1,436 +1,484 @@
-# 🚗 Automotive Analytics System
+# 🚗 VORTEX - Automotive Intelligence Platform
 
 **AI-Powered Sales & Inventory Analytics Dashboard**
 
-A comprehensive analytics platform combining FastAPI backend, Streamlit dashboard, PostgreSQL database, and OpenAI integration for intelligent insights.
+A production-ready, full-stack analytics platform with FastAPI backend, Streamlit dashboard, PostgreSQL database, and OpenAI GPT-4 integration.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kmrsdrm-arch/vortex-automotive-analytics)
+
+---
+
+## 🌟 Live Demo
+
+- **Dashboard**: [Deploy to Streamlit Cloud](https://streamlit.io/cloud)
+- **API Docs**: `https://your-app.vercel.app/docs`
+- **Source Code**: https://github.com/kmrsdrm-arch/vortex-automotive-analytics
+
+---
+
+## ✨ Features
+
+### 📊 Real-Time Analytics Dashboard
+- Executive KPI overview with beautiful metrics
+- Interactive Plotly charts and visualizations
+- Sales trends and performance analysis
+- Inventory management with low-stock alerts
+
+### 💬 Natural Language Queries
+- Ask questions in plain English
+- AI-powered SQL generation (GPT-4)
+- Interactive results with data tables
+- Query history tracking
+
+### 🤖 AI-Powered Insights
+- Automated trend identification
+- Smart recommendations
+- Predictive analytics
+- Historical pattern analysis
+
+### 📄 Report Generation
+- Executive summaries
+- Detailed performance reports
+- AI-generated content
+- Export as MD/TXT
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Setup Environment
+### Prerequisites
 
-Create `.env` file in project root:
-```bash
-DATABASE_URL=postgresql://automotive_user:automotive_password@localhost:5432/automotive_analytics
-OPENAI_API_KEY=sk-your-openai-key-here
-```
+- Python 3.11+
+- PostgreSQL database (or use Neon free tier)
+- OpenAI API key
 
-### 2. Install Dependencies
+### Local Development
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-```
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/kmrsdrm-arch/vortex-automotive-analytics.git
+   cd vortex-automotive-analytics
+   ```
 
-### 3. Start Services
+2. **Setup Environment**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   # source venv/bin/activate  # Linux/Mac
 
-```batch
-start.bat
-```
+   # Install dependencies
+   pip install -r requirements.txt
+   ```
 
-That's it! The dashboard opens automatically at **http://localhost:8501**
+3. **Configure Environment Variables**
+   
+   Create `.env` file (see `environment.example`):
+   ```env
+   DATABASE_URL=postgresql://user:pass@localhost:5432/automotive_analytics
+   OPENAI_API_KEY=sk-proj-your-key-here
+   ```
 
----
+4. **Initialize Database**
+   ```bash
+   # Start PostgreSQL (or use Docker)
+   docker-compose up -d postgres
 
-## 📋 Commands
+   # Initialize database
+   python scripts/init_db.py
+   python scripts/seed_data.py
+   ```
 
-```batch
-start.bat           # Start both API and Dashboard
-start.bat stop      # Stop all services
-start.bat restart   # Restart all services
-start.bat test      # Test configuration
-start.bat help      # Show help
-```
+5. **Start Application**
+   ```bash
+   # Start API and Dashboard together
+   start.bat  # Windows
+   
+   # Or start separately:
+   # Terminal 1 - API
+   uvicorn src.api.main:app --reload --port 8000
+   
+   # Terminal 2 - Dashboard
+   streamlit run src/dashboard/app.py
+   ```
 
----
-
-## 📊 Features
-
-### Dashboard Pages
-
-1. **📊 Main Dashboard**
-   - Real-time KPI overview with beautiful metrics
-   - Sales trends with 📊 icons
-   - Top performing vehicles
-   - Regional performance charts
-   - Inventory status alerts
-
-2. **💰 Sales Analytics**
-   - Comprehensive sales metrics
-   - Time-series analysis with area charts
-   - Regional breakdown
-   - Customer segments
-   - Top 10 vehicles performance
-
-3. **📦 Inventory Analytics**
-   - Current stock levels
-   - Low stock alerts
-   - Regional distribution
-   - Category analysis
-
-4. **💬 Natural Language Query**
-   - Ask questions in plain English
-   - AI-powered SQL generation
-   - Interactive results
-   - Query history
-
-5. **🤖 AI Insights**
-   - Automated data analysis
-   - Trend identification
-   - Smart recommendations
-   - Historical insights
-
-6. **📄 Report Generator**
-   - Executive summaries
-   - Detailed reports
-   - AI-generated content
-   - Download as MD/TXT
+6. **Access Application**
+   - Dashboard: http://localhost:8501
+   - API Docs: http://localhost:8000/docs
 
 ---
 
-## 🎨 UI/UX Highlights
+## 🌐 Production Deployment
 
-### Professional Dark Theme
-- **Modern Design**: Sophisticated color palette (#4fc3f7, #64b5f6, #81c784)
-- **Consistent Icons**: 📊 on all charts for visual consistency
-- **Centered Layouts**: Professional, balanced page designs
-- **Enhanced Charts**: 450px height with better hover effects
-- **Full-Width**: Utilizes entire viewport for maximum visibility
+### Deploy to Vercel + Streamlit Cloud (Recommended) ⭐
 
-### Chart Features
-- 📊 Icon in every chart title
-- Professional color gradients
-- Interactive hover tooltips
-- Unified hover mode across time-series
-- Grid lines for better readability
-- Smooth animations
+**Complete guide**: See [DEPLOY_NOW.md](DEPLOY_NOW.md)
+
+**Quick Steps**:
+
+1. **API on Vercel** (5 min)
+   - Go to [vercel.com](https://vercel.com)
+   - Import this repository
+   - Add `OPENAI_API_KEY` environment variable
+   - Deploy!
+
+2. **Database on Neon** (3 min)
+   - Sign up at [neon.tech](https://neon.tech)
+   - Create PostgreSQL database
+   - Add `DATABASE_URL` to Vercel
+   - Run `python scripts/init_db.py`
+
+3. **Dashboard on Streamlit Cloud** (5 min)
+   - Sign up at [streamlit.io/cloud](https://streamlit.io/cloud)
+   - Deploy from GitHub
+   - Add secrets (API_URL, DATABASE_URL, OPENAI_API_KEY)
+   - Done!
+
+**Total Time**: ~20 minutes  
+**Cost**: $0/month (free tiers)
+
+📖 **Full deployment guide**: [DEPLOY_NOW.md](DEPLOY_NOW.md)  
+⚡ **Quick reference**: [VERCEL_QUICKSTART.md](VERCEL_QUICKSTART.md)
 
 ---
 
-## 🛠️ Architecture
+## 🏗️ Architecture
 
 ```
-┌─────────────────┐
-│   Streamlit     │  Port 8501 - Dashboard UI
-│   Dashboard     │
-└────────┬────────┘
-         │ HTTP/REST API
-         │
-┌────────▼────────┐
-│    FastAPI      │  Port 8000 - REST API
-│    Backend      │
-└────────┬────────┘
-         │
-    ┌────┴─────┬──────────┐
-    │          │          │
-┌───▼───┐  ┌──▼───┐  ┌───▼────┐
-│PostgreSQL│ │OpenAI│  │ChromaDB│
-│ Database │ │ API  │  │ Vector │
-└──────────┘ └──────┘  └────────┘
+┌─────────────────────────────┐
+│  Streamlit Dashboard        │  Port 8501
+│  (Frontend UI)              │
+└──────────┬──────────────────┘
+           │ HTTP/REST
+           ▼
+┌─────────────────────────────┐
+│  FastAPI Backend            │  Port 8000
+│  (REST API)                 │
+└──────────┬──────────────────┘
+           │
+    ┌──────┴────────┬─────────────┐
+    ▼               ▼             ▼
+┌────────┐     ┌────────┐    ┌────────┐
+│PostgreSQL│    │OpenAI  │    │ChromaDB│
+│Database  │    │GPT-4   │    │Vectors │
+└──────────┘    └────────┘    └────────┘
 ```
+
+### Tech Stack
+
+**Backend**:
+- FastAPI - Modern async Python web framework
+- SQLAlchemy - ORM for database interactions
+- Pydantic - Data validation and settings
+
+**Frontend**:
+- Streamlit - Python-based dashboard framework
+- Plotly - Interactive data visualizations
+- Pandas - Data manipulation
+
+**Database**:
+- PostgreSQL - Relational database
+- Alembic - Database migrations
+
+**AI/ML**:
+- OpenAI GPT-4 - Natural language processing
+- LangChain - LLM application framework
+- ChromaDB - Vector database for embeddings
+
+**DevOps**:
+- Vercel - Serverless API deployment
+- Streamlit Cloud - Dashboard hosting
+- Docker - Containerization
+- Git - Version control
 
 ---
 
 ## 📁 Project Structure
 
 ```
-cursor/
-├── start.bat                    # 🚀 ONE startup script
-├── test_openai_connection.py   # 🔑 API key tester
-├── README.md                    # 📚 Complete documentation
-├── CHANGELOG.md                 # 📋 Version history
-├── GETTING_STARTED.txt          # 📝 Quick reference
-├── .env                         # ⚙️ Configuration
-├── requirements.txt             # 📦 Dependencies
-│
+vortex-automotive-analytics/
 ├── src/
-│   ├── api/                     # 🔌 FastAPI backend
-│   │   ├── main.py
-│   │   ├── routes/
-│   │   └── schemas/
+│   ├── api/                    # FastAPI backend
+│   │   ├── main.py            # API entry point
+│   │   ├── routes/            # API endpoints
+│   │   └── schemas/           # Pydantic models
 │   │
-│   ├── dashboard/               # 📊 Streamlit frontend
-│   │   ├── app.py              # Main dashboard
-│   │   ├── pages/              # Individual pages
-│   │   ├── components/
-│   │   │   └── charts.py       # ✨ Enhanced charts
-│   │   ├── styles/
-│   │   │   └── theme.py        # 🎨 Dark theme
-│   │   └── utils/
-│   │       └── api_client.py   # API client with unwrapping
+│   ├── dashboard/             # Streamlit frontend
+│   │   ├── app.py            # Main dashboard
+│   │   ├── pages/            # Dashboard pages
+│   │   ├── components/       # Reusable UI components
+│   │   └── styles/           # Theme and styling
 │   │
-│   ├── database/                # 🗄️ Database models
-│   │   ├── models/
-│   │   └── repositories/
+│   ├── database/              # Database layer
+│   │   ├── models/           # SQLAlchemy models
+│   │   └── repositories/     # Data access layer
 │   │
-│   ├── llm/                     # 🤖 OpenAI integration
-│   │   ├── core/
-│   │   └── services/
+│   ├── llm/                   # AI/ML integration
+│   │   ├── core/             # OpenAI client
+│   │   └── services/         # LLM services
 │   │
-│   ├── analytics/               # 📈 Analytics engine
-│   └── pipeline/                # 🔄 Data pipeline
+│   ├── analytics/             # Business logic
+│   │   ├── kpi_calculator.py
+│   │   └── sales_analytics.py
+│   │
+│   └── utils/                 # Utilities
 │
-├── config/                      # ⚙️ Configuration
-├── scripts/                     # 🔧 Utility scripts
-├── tests/                       # 🧪 Tests
-└── data/                        # 💾 Data storage
+├── scripts/                   # Utility scripts
+│   ├── init_db.py           # Database initialization
+│   └── seed_data.py         # Sample data generator
+│
+├── config/                    # Configuration
+│   ├── settings.py          # App settings (Pydantic)
+│   └── database.py          # Database config
+│
+├── tests/                     # Test suite
+├── api/                       # Vercel serverless entry
+├── docs/                      # Additional documentation
+│
+├── vercel.json               # Vercel deployment config
+├── docker-compose.yml        # Docker configuration
+├── requirements.txt          # Python dependencies
+├── environment.example       # Environment template
+├── start.bat                # Local startup script
+└── README.md                # This file
 ```
+
+---
+
+## 🎨 Dashboard Pages
+
+1. **Dashboard Summary** - Executive overview with key metrics
+2. **Sales Analytics** - Comprehensive sales performance analysis
+3. **Inventory Analytics** - Stock levels and distribution
+4. **Natural Language Query** - Ask questions in plain English
+5. **AI Insights** - Automated analysis and recommendations
+6. **Reports** - Generate and export reports
 
 ---
 
 ## 🔧 Configuration
 
-### Environment Variables (.env)
+### Environment Variables
 
-```bash
+See `environment.example` for full list. Key variables:
+
+```env
 # Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/db
-DB_POOL_SIZE=10
-DB_MAX_OVERFLOW=20
+DATABASE_URL=postgresql://user:pass@host:port/db
 
 # OpenAI
-OPENAI_API_KEY=sk-your-key-here
+OPENAI_API_KEY=sk-proj-your-key-here
 OPENAI_MODEL_PRIMARY=gpt-4-turbo-preview
 OPENAI_MODEL_SECONDARY=gpt-3.5-turbo
-OPENAI_MAX_TOKENS=4000
 
 # API
 API_HOST=0.0.0.0
 API_PORT=8000
-
-# Dashboard
-DASHBOARD_PORT=8501
-
-# Logging
-LOG_LEVEL=INFO
-LOG_FILE=logs/app.log
+API_URL=http://localhost:8000  # For dashboard
 
 # Features
 ENABLE_RAG=true
 ENABLE_CACHING=false
+
+# App
+DEBUG=false
+LOG_LEVEL=INFO
 ```
 
 ---
 
-## 🚀 Advanced Usage
-
-### Manual Service Start
+## 🧪 Testing
 
 ```bash
-# Terminal 1 - API Server
-venv\Scripts\activate
-uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+# Run all tests
+pytest
 
-# Terminal 2 - Dashboard
-venv\Scripts\activate
-streamlit run src/dashboard/app.py --server.port 8501
-```
+# Run with coverage
+pytest --cov=src tests/
 
-### Database Setup
-
-```bash
-python scripts/init_db.py      # Initialize database
-python scripts/seed_data.py    # Seed with sample data
-python scripts/run_pipeline.py # Run data pipeline
-```
-
-### Testing
-
-```bash
-start.bat test                  # Test configuration
-python test_openai_connection.py # Test OpenAI connection
-pytest tests/                   # Run unit tests
+# Run specific test file
+pytest tests/test_api.py
 ```
 
 ---
 
-## 🔍 Troubleshooting
+## 📊 API Endpoints
 
-### Chart Not Displaying
+### Health & Status
+- `GET /health` - Health check
+- `GET /` - API info
 
-**Problem**: Charts show errors or don't display
+### Analytics
+- `GET /api/v1/analytics/kpis` - Key performance indicators
+- `GET /api/v1/analytics/sales/summary` - Sales summary
+- `GET /api/v1/analytics/sales/trends` - Sales trends
+- `GET /api/v1/analytics/inventory` - Inventory data
 
-**Solution**:
-1. Hard refresh browser (Ctrl+F5)
-2. Check browser console (F12) for errors
-3. Verify API is running: http://localhost:8000/docs
-4. Check data is available for the selected date range
+### AI Features
+- `POST /api/v1/query/natural-language` - NL to SQL query
+- `POST /api/v1/insights/generate` - Generate insights
+- `POST /api/v1/reports/generate` - Generate reports
 
-### OpenAI API Key Issues
-
-**Problem**: 401 Authentication Error
-
-**Solution**:
-1. Verify key at: https://platform.openai.com/api-keys
-2. Update `.env` file with correct key
-3. Restart: `start.bat restart`
-4. Test: `start.bat test`
-
-### Port Already in Use
-
-**Problem**: Port 8000 or 8501 already in use
-
-**Solution**:
-```batch
-start.bat stop    # Stops all services
-start.bat start   # Starts fresh
-```
-
-### Dashboard Not Loading
-
-**Problem**: Blank page or errors
-
-**Solution**:
-1. Hard refresh (Ctrl+F5)
-2. Clear browser cache
-3. Check console (F12)
-4. Restart: `start.bat restart`
+**Full API docs**: http://localhost:8000/docs (Swagger UI)
 
 ---
 
-## 📚 API Documentation
+## 🎯 Use Cases
 
-### Interactive Docs
+### Business Intelligence
+- Executive dashboards for decision-making
+- Sales performance tracking
+- Inventory optimization
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+### Data Analytics
+- Trend analysis and forecasting
+- Customer segmentation
+- Regional performance comparison
 
-### Key Endpoints
-
-```
-GET  /health                           # Health check
-GET  /api/v1/analytics/kpis            # KPI metrics
-GET  /api/v1/analytics/sales/summary   # Sales summary
-GET  /api/v1/analytics/sales/trends    # Sales trends
-GET  /api/v1/analytics/inventory       # Inventory data
-POST /api/v1/query/natural-language    # NL Query
-POST /api/v1/insights/generate         # Generate insights
-POST /api/v1/reports/generate          # Generate reports
-```
+### AI Integration
+- Natural language data queries
+- Automated insight generation
+- Intelligent recommendations
 
 ---
 
-## ✨ Recent Updates
+## 🚀 Performance
 
-### Version 2.0.0 (November 2025)
-
-#### ✅ **Major Consolidation**
-- Reduced 12+ .bat files to 1 universal script
-- Consolidated 9+ docs into 1 comprehensive README
-- 90% simpler to use and maintain
-
-#### ✅ **Fixed Issues**
-- **OpenAI API Key**: Now loads correctly from .env
-- **Sales Trend Chart**: Fixed data parsing (unwraps `{"value": [...]}` format)
-- **Chart Margins**: Fixed plotly layout conflict errors
-- **API Client**: Handles both wrapped and direct array responses
-
-#### ✅ **Enhanced UI/UX**
-- Added 📊 icons to all charts
-- Centered page titles (3rem font)
-- Professional color scheme throughout
-- Increased chart height to 450px
-- Better hover effects and interactivity
-- Consistent styling across all 6 pages
-
----
-
-## 🎯 Performance
-
-- **Response Time**: < 100ms for most endpoints
-- **Chart Rendering**: Optimized with proper layout merging
-- **Database Pooling**: 10 connections, 20 overflow
-- **Auto-reload**: Streamlit hot-reloads on file changes
+- **API Response Time**: < 100ms for most endpoints
+- **Dashboard Load**: < 2 seconds (after cold start)
+- **Database Queries**: Optimized with indexes
+- **Scalability**: Serverless architecture (auto-scaling)
 
 ---
 
 ## 🔒 Security
 
-- API Key stored in `.env`, never committed
-- CORS configured for localhost
-- SQL injection prevented via SQLAlchemy ORM
-- Input validation with Pydantic schemas
-- Safe error messages, detailed logs
+- ✅ Environment variables for secrets (never hardcoded)
+- ✅ CORS configuration for API access control
+- ✅ SQL injection prevention via SQLAlchemy ORM
+- ✅ Input validation with Pydantic schemas
+- ✅ HTTPS enabled on all deployments
 
 ---
 
-## 🚢 Deployment
+## 📧 Sharing with Hiring Managers
 
-### Quick Deploy to Render.com (Recommended for Demos) ⭐
+Use this template:
 
-**Get your app live in 15 minutes!**
+```
+Subject: Portfolio Demo - VORTEX Automotive Intelligence Platform
 
-1. Push code to GitHub
-2. Go to [render.com](https://render.com) → "New Blueprint"
-3. Connect your repository
-4. Add your `OPENAI_API_KEY`
-5. Click "Apply"
+Hi [Name],
 
-**Done!** Your app will be live at:
-- Dashboard: `https://vortex-dashboard.onrender.com`
-- API: `https://vortex-api.onrender.com`
+I'd like to share my full-stack AI project:
 
-📖 **Full Guide**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions
-🚀 **Quick Start**: See [DEPLOYMENT_QUICKSTART.md](DEPLOYMENT_QUICKSTART.md) for 5-step guide
+🔗 Live Demo: https://[your-app].streamlit.app
+📚 API Docs: https://[your-app].vercel.app/docs
+💻 Source: https://github.com/kmrsdrm-arch/vortex-automotive-analytics
 
-### Docker (For Self-Hosting)
+Tech Stack: FastAPI | Streamlit | PostgreSQL | OpenAI GPT-4
+Architecture: Vercel (API) + Streamlit Cloud (UI) + Neon (DB)
 
+Key Features:
+• Real-time analytics dashboard
+• Natural language SQL queries (GPT-4)
+• AI-generated insights
+• Production serverless deployment
+
+This demonstrates my skills in:
+✅ Full-stack development
+✅ AI/ML integration
+✅ Cloud deployment
+✅ API design
+✅ Database optimization
+
+I'd love to discuss how my experience aligns with your team's needs.
+
+Best regards,
+[Your Name]
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### Database Connection Issues
 ```bash
-docker-compose build    # Build image
-docker-compose up -d    # Start services
-docker-compose down     # Stop services
+# Check PostgreSQL is running
+docker-compose ps
+
+# Verify connection string
+python -c "from config.settings import settings; print(settings.database_url)"
 ```
 
-### Manual Deployment
+### OpenAI API Errors
+- Verify API key at https://platform.openai.com/api-keys
+- Check account has credits
+- Ensure key format: `sk-proj-...` or `sk-...`
 
-1. Set production environment variables (see `environment.example`)
-2. Use production database
-3. Set `DEBUG=false`
-4. Use gunicorn for API
-5. Use nginx reverse proxy
-6. Enable SSL/TLS
+### Dashboard Won't Load
+- Hard refresh: Ctrl+F5
+- Check API is running: http://localhost:8000/docs
+- Verify `API_URL` environment variable
+
+### Deployment Issues
+- See [DEPLOY_NOW.md](DEPLOY_NOW.md) for detailed troubleshooting
+- Check deployment logs in Vercel/Streamlit dashboard
+- Verify all environment variables are set
 
 ---
 
-## 🆘 Support
+## 📚 Documentation
 
-### Quick Commands
-
-```batch
-start.bat         # Start everything
-start.bat stop    # Stop everything
-start.bat restart # Restart everything  
-start.bat test    # Test configuration
-start.bat help    # Show help
-```
-
-### Useful Links
-
-- **Dashboard**: http://localhost:8501
-- **API Docs**: http://localhost:8000/docs
-- **OpenAI Keys**: https://platform.openai.com/api-keys
-- **Streamlit Docs**: https://docs.streamlit.io
-- **FastAPI Docs**: https://fastapi.tiangolo.com
+- **Deployment Guide**: [DEPLOY_NOW.md](DEPLOY_NOW.md) - Production deployment
+- **Quick Start**: [VERCEL_QUICKSTART.md](VERCEL_QUICKSTART.md) - 5-step deploy
+- **Full Guide**: [VERCEL_DEPLOYMENT_GUIDE.md](VERCEL_DEPLOYMENT_GUIDE.md) - Detailed instructions
+- **Environment Setup**: [environment.example](environment.example) - Configuration reference
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md) - Version history
 
 ---
 
-## 🎉 Success!
+## 🤝 Contributing
 
-Your Automotive Analytics System is ready!
+This is a portfolio project, but suggestions and feedback are welcome!
 
-```
-┌────────────────────────────────────────┐
-│  🚗 AUTOMOTIVE ANALYTICS               │
-│                                        │
-│  ✅ API Running on :8000              │
-│  ✅ Dashboard on :8501                │
-│  ✅ OpenAI Connected                  │
-│  ✅ Charts Fixed & Beautiful          │
-│                                        │
-│  Everything is working perfectly!     │
-└────────────────────────────────────────┘
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is open source and available for educational and portfolio purposes.
+
+---
+
+## 👨‍💻 Author
+
+**kmrsdrm-arch**
+
+- GitHub: [@kmrsdrm-arch](https://github.com/kmrsdrm-arch)
+- Repository: [vortex-automotive-analytics](https://github.com/kmrsdrm-arch/vortex-automotive-analytics)
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Streamlit](https://streamlit.io/)
+- [OpenAI](https://openai.com/)
+- [LangChain](https://langchain.com/)
+- [Plotly](https://plotly.com/)
+
+---
+
+## ⭐ Show Your Support
+
+If you find this project helpful, please consider giving it a star on GitHub!
+
+---
 
 **Happy Analyzing! 📊🚀**

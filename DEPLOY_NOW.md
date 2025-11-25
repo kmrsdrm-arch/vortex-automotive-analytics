@@ -1,12 +1,23 @@
-# 🎉 VORTEX is Ready for Vercel Deployment!
+# 🚀 VORTEX - Production Deployment Guide
 
-Your code is on GitHub and ready to deploy! ✅
+**Deploy VORTEX to Vercel + Streamlit Cloud in 20 Minutes**
+
+Your code is on GitHub and ready for production deployment! ✅
 
 **Repository**: https://github.com/kmrsdrm-arch/vortex-automotive-analytics
 
 ---
 
-## 🚀 Deploy Now (20 Minutes to Live!)
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Deployment Steps](#deployment-steps)
+- [Post-Deployment](#post-deployment)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## 🎯 Overview
 
 ### ⚡ Quick Overview
 
