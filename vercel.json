@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "vortex-automotive-analytics",
+  "name": "vortex-kmrsdrm",
   "builds": [
     {
       "src": "src/api/main.py",
