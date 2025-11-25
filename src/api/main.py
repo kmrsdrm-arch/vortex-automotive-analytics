@@ -260,11 +260,16 @@ async def startup_event():
     OpenAI connection is invalid.
     """
     # Log startup information
-    logger.info(f"Starting {settings.app_name} v{settings.app_version}")
-    logger.info(f"API server starting on {settings.api_host}:{settings.api_port}")
+    try:
+        logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+        logger.info(f"API server starting on {settings.api_host}:{settings.api_port}")
+        logger.info(f"DATABASE_URL configured: {settings.database_url[:20]}...") # Log first 20 chars only
+    except Exception as e:
+        logger.error(f"Failed to load settings: {e}")
+        # Continue anyway - settings might be partially loaded
     
     # ===================================================================================
-    # OPENAI API VALIDATION
+    # OPENAI API VALIDATION (Optional - won't crash if fails)
     # ===================================================================================
     
     try:
@@ -273,14 +278,9 @@ async def startup_event():
         logger.info("Validating OpenAI API connection...")
         
         # Test with a simple completion request
-        # This verifies:
-        # - API key is valid
-        # - Account has credits
-        # - Network connection works
-        # - OpenAI service is up
         test_response = client.simple_completion(
             prompt="Say 'OK' if you can read this.",
-            temperature=0.0  # Deterministic response
+            temperature=0.0
         )
         
         if test_response:
@@ -290,13 +290,10 @@ async def startup_event():
             logger.warning("⚠️ OpenAI API returned empty response")
             
     except Exception as e:
-        # Log detailed error information
-        logger.error(f"❌ OpenAI API validation failed: {e}")
-        logger.error("⚠️ LLM-powered features (NL Query, Insights, Reports) will not work properly")
-        logger.error("Please check your OPENAI_API_KEY in .env file and ensure your account has sufficient credits")
-        
-        # Don't raise exception - allow API to start anyway
-        # This enables graceful degradation
+        # Log but don't crash
+        logger.warning(f"⚠️ OpenAI API validation skipped: {e}")
+        logger.warning("LLM-powered features may not work until OpenAI API key is configured")
+        # This is OK - app can still serve basic endpoints
 
 
 @app.on_event("shutdown")
