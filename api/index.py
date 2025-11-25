@@ -6,14 +6,14 @@ This file adapts the FastAPI application to work with Vercel's serverless platfo
 import sys
 import os
 
-# Add project root to path
+# Add project root to Python path for imports
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Import FastAPI app
+# Import the FastAPI application
 from src.api.main import app
 
-# Vercel expects an 'app' or 'handler' export
-# This makes the FastAPI app available to Vercel
+# Export for Vercel
+# Vercel's Python runtime looks for 'app' or 'handler' variable
 handler = app

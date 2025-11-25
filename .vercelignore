@@ -46,3 +46,10 @@ alembic/
 scripts/
 verify_openai_api.py
 
+# Streamlit Dashboard (deploy separately to Streamlit Cloud)
+src/dashboard/
+
+# Generated/temporary files
+REFACTORING_COMPLETE.md
+CHANGELOG.md
+
