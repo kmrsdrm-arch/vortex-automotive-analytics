@@ -21,7 +21,22 @@ A comprehensive analytics platform combining FastAPI backend, Streamlit dashboar
 
 ---
 
-## 🚀 Quick Start
+## 🎉 **FREE DEPLOYMENT** - Deploy for $0/month!
+
+> **Want to deploy this app online for FREE?**
+> 
+> 📖 **See complete guide**: [`FREE_DEPLOYMENT_GUIDE.md`](./FREE_DEPLOYMENT_GUIDE.md)
+> 
+> **Free hosting stack:**
+> - ✅ Backend API → **Vercel** (Free tier)
+> - ✅ Database → **Neon.tech** (Free PostgreSQL)
+> - ✅ Dashboard → **Streamlit Cloud** (Free hosting)
+> 
+> **Total cost: $0/month** | No credit card required | Deploy in 15 minutes
+
+---
+
+## 🚀 Quick Start (Local Development)
 
 ### 1. Setup Environment
 
