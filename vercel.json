@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "vortex-automotive-analytics",
+  "builds": [
+    {
+      "src": "src/api/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "src/api/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "src/api/main.py"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "PYTHON_VERSION": "3.11"
+  }
+}
+
