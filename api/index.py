@@ -309,12 +309,34 @@ if project_root not in sys.path:
 # IMPORT FASTAPI APPLICATION
 # ===================================================================================
 
-# Import the main FastAPI application from src/api/main.py
-from src.api.main import app
-
-# ===================================================================================
-# VERCEL HANDLER EXPORT
-# ===================================================================================
-
-# Vercel's Python runtime looks for 'app' or 'handler' variable
-handler = app
+try:
+    # Try to import the main FastAPI application
+    from src.api.main import app
+    handler = app
+    
+except Exception as e:
+    # If import fails, create a simple FastAPI app that shows the error
+    from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
+    import traceback
+    
+    app = FastAPI(title="Vortex API - Error Debug")
+    
+    @app.get("/")
+    async def root():
+        return JSONResponse({
+            "error": "Failed to import main application",
+            "message": str(e),
+            "traceback": traceback.format_exc(),
+            "python_version": sys.version,
+            "sys_path": sys.path[:5]  # Show first 5 paths
+        }, status_code=500)
+    
+    @app.get("/health")
+    async def health():
+        return JSONResponse({
+            "status": "error",
+            "error": str(e)
+        }, status_code=500)
+    
+    handler = app
