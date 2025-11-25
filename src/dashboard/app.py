@@ -164,51 +164,6 @@ with st.spinner("Loading KPIs..."):
 if kpis:
     # Display KPIs
     display_kpi_row(kpis)
-else:
-    # Show helpful error message
-    st.error("⚠️ **Unable to load KPI data**")
-    
-    with st.expander("🔧 Troubleshooting"):
-        st.markdown(f"""
-        **Current API URL:** `{st.session_state.api_url}`
-        
-        **Possible causes:**
-        1. 🔌 **API is sleeping** (free tier services sleep after 15 min)
-           - **Fix:** Visit your API URL to wake it up, wait 30-60 seconds
-        
-        2. 🔑 **API_URL not configured**
-           - **Fix:** Add `API_URL` to Streamlit Secrets
-           - Go to: Settings → Secrets → Add: `API_URL = "https://your-api.onrender.com"`
-        
-        3. 🗄️ **Database has no data**
-           - **Fix:** Seed the database first
-           - Visit: {st.session_state.api_url}/docs
-           - Run the `/api/v1/seed` endpoint
-        
-        4. ❌ **API is down**
-           - **Test:** Open {st.session_state.api_url} in a new tab
-           - **Should see:** JSON response with "message"
-        
-        **Quick test:**
-        """)
-        
-        if st.button("🔄 Test API Connection"):
-            with st.spinner("Testing API..."):
-                import requests
-                try:
-                    response = requests.get(f"{st.session_state.api_url}/health", timeout=10)
-                    if response.status_code == 200:
-                        st.success(f"✅ API is reachable! Response: {response.json()}")
-                    else:
-                        st.error(f"❌ API returned status {response.status_code}")
-                except requests.exceptions.Timeout:
-                    st.warning("⏱️ API timeout. It might be waking up from sleep. Try again in 30 seconds.")
-                except requests.exceptions.ConnectionError:
-                    st.error("🔌 Cannot connect to API. Check if API_URL is correct.")
-                except Exception as e:
-                    st.error(f"⚠️ Error: {str(e)}")
-    
-    st.stop()  # Don't render rest of dashboard if no data
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("---")
@@ -305,7 +260,49 @@ else:
     st.markdown("<br>", unsafe_allow_html=True)
 
 else:
-    st.error("Unable to load KPI data. Please ensure the API is running.")
+    # Show helpful error message
+    st.error("⚠️ **Unable to load KPI data**")
+    
+    with st.expander("🔧 Troubleshooting", expanded=True):
+        st.markdown(f"""
+        **Current API URL:** `{st.session_state.api_url}`
+        
+        **Possible causes:**
+        1. 🔌 **API is sleeping** (free tier services sleep after 15 min)
+           - **Fix:** Visit your API URL to wake it up, wait 30-60 seconds
+        
+        2. 🔑 **API_URL not configured**
+           - **Fix:** Add `API_URL` to Streamlit Secrets
+           - Go to: Settings → Secrets → Add: `API_URL = "https://your-api.onrender.com"`
+        
+        3. 🗄️ **Database has no data**
+           - **Fix:** Seed the database first
+           - Visit: {st.session_state.api_url}/docs
+           - Run the `/api/v1/seed` endpoint
+        
+        4. ❌ **API is down**
+           - **Test:** Open {st.session_state.api_url} in a new tab
+           - **Should see:** JSON response with "message"
+        
+        **Quick test:**
+        """)
+        
+        if st.button("🔄 Test API Connection"):
+            with st.spinner("Testing API..."):
+                import requests
+                try:
+                    response = requests.get(f"{st.session_state.api_url}/health", timeout=10)
+                    if response.status_code == 200:
+                        st.success(f"✅ API is reachable! Response: {response.json()}")
+                        st.info("💡 If API is healthy, try refreshing this page in 10 seconds.")
+                    else:
+                        st.error(f"❌ API returned status {response.status_code}")
+                except requests.exceptions.Timeout:
+                    st.warning("⏱️ API timeout. It might be waking up from sleep. Try again in 30 seconds.")
+                except requests.exceptions.ConnectionError:
+                    st.error("🔌 Cannot connect to API. Check if API_URL is correct.")
+                except Exception as e:
+                    st.error(f"⚠️ Error: {str(e)}")
 
 # Footer
 st.markdown("---")
