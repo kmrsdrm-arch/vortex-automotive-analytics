@@ -20,8 +20,13 @@ tiktoken==0.5.1
 
 # HTTP Client
 httpx==0.25.2
+requests==2.31.0
 
 # Utilities
 python-dotenv==1.0.0
 python-multipart==0.0.6
 python-json-logger==2.0.7
+
+# Dashboard (if deploying Streamlit on same service)
+streamlit==1.29.0
+plotly==5.18.0

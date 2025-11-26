@@ -44,6 +44,10 @@ async def reset_database():
     try:
         logger.info("Starting database reset - DROPPING ALL TABLES...")
         
+        # Dispose all connections to ensure clean state
+        engine.dispose()
+        logger.info("Disposed all database connections")
+        
         # Drop all tables
         Base.metadata.drop_all(bind=engine)
         logger.info("All tables dropped successfully")
@@ -52,7 +56,11 @@ async def reset_database():
         Base.metadata.create_all(bind=engine)
         logger.info("All tables recreated successfully")
         
-        # Verify tables were created
+        # Dispose connections again to force reconnection
+        engine.dispose()
+        logger.info("Disposed connections to force fresh connections")
+        
+        # Verify tables were created with a fresh connection
         inspector = inspect(engine)
         tables = inspector.get_table_names()
         logger.info(f"Tables after reset: {tables}")
