@@ -204,7 +204,7 @@ async def seed_database(
         
         # Check database connection first
         try:
-            db.execute("SELECT 1")
+            db.execute(text("SELECT 1"))
             logger.info("✅ Database connection verified")
         except Exception as conn_err:
             logger.error(f"❌ Database connection failed: {conn_err}")
