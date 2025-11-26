@@ -16,17 +16,22 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy import text, inspect
-from config.database import engine
-from src.utils.logger import get_logger
 
-# Import all models FIRST to register them with Base.metadata
+# Import logger first
+from src.utils.logger import get_logger
+logger = get_logger(__name__)
+
+# Import engine
+from config.database import engine
+
+# Import Base FIRST
+from src.database.models.base import Base
+
+# Then import ALL models to register them
 from src.database.models.vehicle import Vehicle
 from src.database.models.inventory import Inventory
 from src.database.models.sales import Sales
 from src.database.models.analytics import AnalyticsSnapshot, InsightHistory
-from src.database.models import Base
-
-logger = get_logger(__name__)
 
 
 def check_database_connection():
