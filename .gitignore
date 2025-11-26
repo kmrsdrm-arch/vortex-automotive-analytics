@@ -1,73 +1,51 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Virtual Environment
-venv/
-ENV/
-env/
-.venv
+# Testing
+/coverage
 
-# IDEs
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Environment variables
+.env
+.env*.local
+.env.production
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Drizzle
+/drizzle
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local
+.DS_Store
+*.pem
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
 
-# Environment Variables
-.env
-.env.local
-.env.*.local
-
-# Logs
-logs/
-*.log
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# ChromaDB
-data/chromadb/
-
-# Alembic
-alembic/versions/__pycache__/
-
-# Test Coverage
-.coverage
-.pytest_cache/
-htmlcov/
-.tox/
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
-
-# Docker
-*.pid
-*.seed
-*.pid.lock
-
-# OS
-Thumbs.db
-
+# Misc
+.turbo
