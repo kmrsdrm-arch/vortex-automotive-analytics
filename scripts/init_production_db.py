@@ -17,8 +17,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from sqlalchemy import text, inspect
 from config.database import engine
-from src.database.models import Base
 from src.utils.logger import get_logger
+
+# Import all models FIRST to register them with Base.metadata
+from src.database.models.vehicle import Vehicle
+from src.database.models.inventory import Inventory
+from src.database.models.sales import Sales
+from src.database.models.analytics import AnalyticsSnapshot, InsightHistory
+from src.database.models import Base
 
 logger = get_logger(__name__)
 
@@ -57,9 +63,7 @@ def create_tables():
     try:
         logger.info("🏗️  Creating database tables...")
         
-        # Import all models to ensure they're registered with Base
-        from src.database.models import Vehicle, Inventory, Sales, AnalyticsSnapshot, InsightHistory
-        
+        # All models are already imported at module level
         # Create all tables
         Base.metadata.create_all(bind=engine)
         

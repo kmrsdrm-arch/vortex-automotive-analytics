@@ -12,6 +12,11 @@ from src.database.repositories.sales_repo import SalesRepository
 from src.database.repositories.inventory_repo import InventoryRepository
 from src.data_generation.synthetic_data import SyntheticDataGenerator
 from src.data_generation.seeder import DatabaseSeeder
+# Import all models FIRST to register them with Base.metadata
+from src.database.models.vehicle import Vehicle
+from src.database.models.inventory import Inventory
+from src.database.models.sales import Sales
+from src.database.models.analytics import AnalyticsSnapshot, InsightHistory
 from src.database.models import Base
 from config.logging_config import logger
 from config.database import engine
@@ -37,9 +42,7 @@ async def initialize_database():
     try:
         logger.info("Starting manual database initialization...")
         
-        # Import all models to ensure they're registered
-        from src.database.models import Vehicle, Inventory, Sales, AnalyticsSnapshot, InsightHistory
-        
+        # All models are already imported at module level
         # Check existing tables
         inspector = inspect(engine)
         existing_tables = inspector.get_table_names()
