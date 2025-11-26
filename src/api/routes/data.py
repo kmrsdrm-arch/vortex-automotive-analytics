@@ -88,15 +88,28 @@ async def initialize_database():
         logger.info("Starting manual database initialization...")
         
         # All models are already imported at module level
+        # Check what tables Base.metadata knows about
+        logger.info(f"Tables registered in Base.metadata: {list(Base.metadata.tables.keys())}")
+        
         # Check existing tables
         inspector = inspect(engine)
         existing_tables = inspector.get_table_names()
         logger.info(f"Existing tables before init: {existing_tables}")
         
+        # Dispose connections before creating to ensure clean state
+        engine.dispose()
+        logger.info("Disposed all database connections before create_all")
+        
         # Create all tables
         Base.metadata.create_all(bind=engine)
+        logger.info("create_all() completed")
         
-        # Verify tables were created
+        # Dispose connections after creating to force fresh connections
+        engine.dispose()
+        logger.info("Disposed all database connections after create_all")
+        
+        # Verify tables were created with fresh connection
+        inspector = inspect(engine)
         updated_tables = inspector.get_table_names()
         logger.info(f"Tables after init: {updated_tables}")
         
