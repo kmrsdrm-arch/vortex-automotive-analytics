@@ -27,6 +27,257 @@ from src.database.models.analytics import AnalyticsSnapshot, InsightHistory
 router = APIRouter(prefix="/api/v1/data", tags=["Data"])
 
 
+@router.post("/diagnose-db")
+async def diagnose_database():
+    """
+    Comprehensive database diagnostics using raw SQL and SQLAlchemy.
+    
+    This endpoint performs multiple tests to identify why tables aren't being created:
+    1. Basic connectivity test
+    2. User/database information
+    3. Schema verification
+    4. Permission checks
+    5. Raw SQL table creation test
+    6. SQLAlchemy metadata inspection
+    7. SQLAlchemy create_all test
+    """
+    results = {
+        "tests": {},
+        "summary": "",
+        "recommendations": []
+    }
+    
+    try:
+        # Test 1: Basic connectivity
+        logger.info("TEST 1: Basic connectivity check")
+        try:
+            with engine.connect() as conn:
+                result = conn.execute(text("SELECT 1 as test")).fetchone()
+                results["tests"]["connectivity"] = {
+                    "status": "PASS",
+                    "result": f"Database responded: {result[0]}"
+                }
+                logger.info("✓ Connectivity test PASSED")
+        except Exception as e:
+            results["tests"]["connectivity"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ Connectivity test FAILED: {e}")
+            
+        # Test 2: User and database information
+        logger.info("TEST 2: User and database information")
+        try:
+            with engine.connect() as conn:
+                result = conn.execute(text(
+                    "SELECT current_user, current_database(), current_schema()"
+                )).fetchone()
+                results["tests"]["user_info"] = {
+                    "status": "PASS",
+                    "current_user": result[0],
+                    "current_database": result[1],
+                    "current_schema": result[2]
+                }
+                logger.info(f"✓ Connected as user: {result[0]}, database: {result[1]}, schema: {result[2]}")
+        except Exception as e:
+            results["tests"]["user_info"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ User info test FAILED: {e}")
+            
+        # Test 3: List existing tables with raw SQL
+        logger.info("TEST 3: List existing tables (raw SQL)")
+        try:
+            with engine.connect() as conn:
+                result = conn.execute(text(
+                    "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename"
+                )).fetchall()
+                tables = [row[0] for row in result]
+                results["tests"]["existing_tables_raw"] = {
+                    "status": "PASS",
+                    "tables": tables,
+                    "count": len(tables)
+                }
+                logger.info(f"✓ Found {len(tables)} tables via raw SQL: {tables}")
+        except Exception as e:
+            results["tests"]["existing_tables_raw"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ List tables test FAILED: {e}")
+            
+        # Test 4: Check table creation permissions
+        logger.info("TEST 4: Check CREATE TABLE permissions")
+        try:
+            with engine.connect() as conn:
+                # Try to create a test table
+                conn.execute(text("""
+                    CREATE TABLE IF NOT EXISTS diagnostic_test (
+                        id SERIAL PRIMARY KEY,
+                        test_col VARCHAR(50),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """))
+                conn.commit()
+                
+                # Verify it was created
+                result = conn.execute(text(
+                    "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname='public' AND tablename='diagnostic_test')"
+                )).fetchone()
+                
+                table_exists = result[0]
+                
+                # Clean up
+                if table_exists:
+                    conn.execute(text("DROP TABLE diagnostic_test"))
+                    conn.commit()
+                
+                results["tests"]["create_permission"] = {
+                    "status": "PASS" if table_exists else "FAIL",
+                    "can_create_tables": table_exists,
+                    "message": "Successfully created and dropped test table" if table_exists else "Failed to create test table"
+                }
+                logger.info(f"✓ CREATE permission test: {'PASSED' if table_exists else 'FAILED'}")
+        except Exception as e:
+            results["tests"]["create_permission"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ CREATE permission test FAILED: {e}")
+            
+        # Test 5: Check what SQLAlchemy metadata knows
+        logger.info("TEST 5: SQLAlchemy metadata inspection")
+        try:
+            registered_tables = list(Base.metadata.tables.keys())
+            results["tests"]["sqlalchemy_metadata"] = {
+                "status": "PASS",
+                "registered_tables": registered_tables,
+                "count": len(registered_tables),
+                "expected": ['vehicles', 'inventory', 'sales', 'analytics_snapshots', 'insight_history']
+            }
+            logger.info(f"✓ Base.metadata knows about {len(registered_tables)} tables: {registered_tables}")
+            
+            if len(registered_tables) == 0:
+                results["recommendations"].append("CRITICAL: No tables registered in Base.metadata - models may not be imported correctly")
+            elif len(registered_tables) < 5:
+                results["recommendations"].append(f"WARNING: Only {len(registered_tables)} tables registered, expected 5")
+        except Exception as e:
+            results["tests"]["sqlalchemy_metadata"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ Metadata inspection FAILED: {e}")
+            
+        # Test 6: Try SQLAlchemy create_all
+        logger.info("TEST 6: SQLAlchemy create_all test")
+        try:
+            # Dispose connections first
+            engine.dispose()
+            logger.info("Disposed all connections before create_all")
+            
+            # Get tables before
+            inspector = inspect(engine)
+            before_tables = inspector.get_table_names()
+            logger.info(f"Tables before create_all: {before_tables}")
+            
+            # Create all tables
+            Base.metadata.create_all(bind=engine)
+            logger.info("create_all() executed")
+            
+            # Dispose connections after
+            engine.dispose()
+            logger.info("Disposed all connections after create_all")
+            
+            # Get tables after with fresh connection
+            inspector = inspect(engine)
+            after_tables = inspector.get_table_names()
+            logger.info(f"Tables after create_all: {after_tables}")
+            
+            new_tables = [t for t in after_tables if t not in before_tables]
+            
+            results["tests"]["sqlalchemy_create_all"] = {
+                "status": "PASS" if len(new_tables) > 0 or len(after_tables) >= 5 else "PARTIAL",
+                "before": before_tables,
+                "after": after_tables,
+                "new_tables": new_tables
+            }
+            logger.info(f"✓ create_all test completed. New tables: {new_tables}")
+            
+            if len(after_tables) == 0:
+                results["recommendations"].append("CRITICAL: create_all() executed but no tables exist - possible permission or schema issue")
+            elif len(new_tables) == 0 and len(after_tables) >= 5:
+                results["recommendations"].append("INFO: Tables already exist, create_all() is idempotent")
+        except Exception as e:
+            results["tests"]["sqlalchemy_create_all"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ create_all test FAILED: {e}")
+            results["recommendations"].append(f"ERROR during create_all: {str(e)}")
+            
+        # Test 7: Try creating one table with raw DDL
+        logger.info("TEST 7: Raw DDL table creation test")
+        try:
+            with engine.connect() as conn:
+                # Create a simple version of the vehicles table
+                conn.execute(text("""
+                    CREATE TABLE IF NOT EXISTS vehicles_test (
+                        id SERIAL PRIMARY KEY,
+                        vin VARCHAR(17) UNIQUE NOT NULL,
+                        make VARCHAR(50) NOT NULL,
+                        model VARCHAR(100) NOT NULL,
+                        year INTEGER NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """))
+                conn.commit()
+                
+                # Check if it was created
+                result = conn.execute(text(
+                    "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname='public' AND tablename='vehicles_test')"
+                )).fetchone()
+                
+                table_exists = result[0]
+                
+                # Clean up
+                if table_exists:
+                    conn.execute(text("DROP TABLE vehicles_test"))
+                    conn.commit()
+                
+                results["tests"]["raw_ddl"] = {
+                    "status": "PASS" if table_exists else "FAIL",
+                    "can_create_with_ddl": table_exists,
+                    "message": "Raw DDL successfully created table" if table_exists else "Raw DDL failed to create table"
+                }
+                logger.info(f"✓ Raw DDL test: {'PASSED' if table_exists else 'FAILED'}")
+                
+                if table_exists and len(Base.metadata.tables) == 0:
+                    results["recommendations"].append("CRITICAL: Raw SQL works but SQLAlchemy metadata is empty - model imports may be broken")
+                elif not table_exists:
+                    results["recommendations"].append("CRITICAL: Cannot create tables even with raw SQL - check database permissions")
+        except Exception as e:
+            results["tests"]["raw_ddl"] = {
+                "status": "FAIL",
+                "error": str(e)
+            }
+            logger.error(f"✗ Raw DDL test FAILED: {e}")
+            
+        # Generate summary
+        passed = sum(1 for t in results["tests"].values() if t["status"] == "PASS")
+        total = len(results["tests"])
+        results["summary"] = f"Passed {passed}/{total} tests"
+        
+        logger.info(f"DIAGNOSTIC COMPLETE: {results['summary']}")
+        logger.info(f"Recommendations: {results['recommendations']}")
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"Diagnostic endpoint failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Diagnostic failed: {str(e)}")
+
+
 class SeedRequest(BaseModel):
     """Request model for database seeding."""
     num_vehicles: int = 100
