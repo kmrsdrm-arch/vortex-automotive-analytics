@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import text, inspect
 from typing import Optional
 from pydantic import BaseModel
 
@@ -11,7 +12,9 @@ from src.database.repositories.sales_repo import SalesRepository
 from src.database.repositories.inventory_repo import InventoryRepository
 from src.data_generation.synthetic_data import SyntheticDataGenerator
 from src.data_generation.seeder import DatabaseSeeder
+from src.database.models import Base
 from config.logging_config import logger
+from config.database import engine
 
 router = APIRouter(prefix="/api/v1/data", tags=["Data"])
 
@@ -21,6 +24,50 @@ class SeedRequest(BaseModel):
     num_vehicles: int = 100
     num_sales: int = 10000
     months_back: int = 24
+
+
+@router.post("/init-db")
+async def initialize_database():
+    """
+    Initialize database schema by creating all tables.
+    
+    This endpoint should be called once after deployment to create
+    the database schema. It's idempotent and safe to call multiple times.
+    """
+    try:
+        logger.info("Starting manual database initialization...")
+        
+        # Import all models to ensure they're registered
+        from src.database.models import Vehicle, Inventory, Sales, AnalyticsSnapshot, InsightHistory
+        
+        # Check existing tables
+        inspector = inspect(engine)
+        existing_tables = inspector.get_table_names()
+        logger.info(f"Existing tables before init: {existing_tables}")
+        
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+        
+        # Verify tables were created
+        updated_tables = inspector.get_table_names()
+        logger.info(f"Tables after init: {updated_tables}")
+        
+        # Expected tables
+        expected = ['vehicles', 'inventory', 'sales', 'analytics_snapshots', 'insight_history']
+        created = [t for t in expected if t in updated_tables and t not in existing_tables]
+        already_exist = [t for t in expected if t in existing_tables]
+        
+        return {
+            "success": True,
+            "message": "Database initialized successfully",
+            "tables_created": created,
+            "tables_already_existed": already_exist,
+            "all_tables": updated_tables
+        }
+        
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}")
+        raise HTTPException(status_code=500, detail=f"Database initialization failed: {str(e)}")
 
 
 @router.get("/vehicles")
@@ -148,22 +195,51 @@ async def seed_database(
     - num_vehicles: Number of vehicles to generate (default: 100)
     - num_sales: Number of sales transactions to generate (default: 10000)
     - months_back: How many months of historical data to generate (default: 24)
+    
+    Note: This operation may take 30-60 seconds for large datasets.
     """
     try:
-        logger.info("Starting database seeding via API...")
+        logger.info(f"Starting database seeding via API...")
+        logger.info(f"Parameters: vehicles={seed_request.num_vehicles}, sales={seed_request.num_sales}, months_back={seed_request.months_back}")
+        
+        # Check database connection first
+        try:
+            db.execute("SELECT 1")
+            logger.info("✅ Database connection verified")
+        except Exception as conn_err:
+            logger.error(f"❌ Database connection failed: {conn_err}")
+            raise HTTPException(
+                status_code=503, 
+                detail=f"Database connection failed. Please check if the database is accessible."
+            )
+        
+        # Validate inputs
+        if seed_request.num_vehicles < 1 or seed_request.num_vehicles > 1000:
+            raise HTTPException(status_code=400, detail="num_vehicles must be between 1 and 1000")
+        
+        if seed_request.num_sales < 1 or seed_request.num_sales > 100000:
+            raise HTTPException(status_code=400, detail="num_sales must be between 1 and 100000")
+        
+        if seed_request.months_back < 1 or seed_request.months_back > 60:
+            raise HTTPException(status_code=400, detail="months_back must be between 1 and 60")
         
         # Create generator and seeder
+        logger.info("Creating synthetic data generator...")
         generator = SyntheticDataGenerator(seed=42)
+        
+        logger.info("Creating database seeder...")
         seeder = DatabaseSeeder(db, generator)
         
         # Seed all data
+        logger.info("Starting data generation and insertion...")
         summary = seeder.seed_all(
             num_vehicles=seed_request.num_vehicles,
             num_sales=seed_request.num_sales,
             months_back=seed_request.months_back
         )
         
-        logger.info("Database seeding completed successfully via API!")
+        logger.info(f"✅ Database seeding completed successfully!")
+        logger.info(f"Summary: {summary}")
         
         return {
             "success": True,
@@ -172,10 +248,27 @@ async def seed_database(
                 "vehicles": summary['vehicles'],
                 "inventory_records": summary['inventory'],
                 "sales_transactions": summary['sales']
-            }
+            },
+            "note": "Data generation completed. You can now use the analytics endpoints."
         }
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    
     except Exception as e:
-        logger.error(f"Error seeding database via API: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to seed database: {str(e)}")
+        # Log full traceback for debugging
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"❌ Error seeding database via API: {e}")
+        logger.error(f"Full traceback: {error_details}")
+        
+        raise HTTPException(
+            status_code=500, 
+            detail={
+                "error": "Failed to seed database",
+                "message": str(e),
+                "hint": "Check server logs for detailed error information. Common issues: database tables not created, database connection lost, or insufficient memory."
+            }
+        )
 
