@@ -34,6 +34,40 @@ class SeedRequest(BaseModel):
     months_back: int = 24
 
 
+@router.post("/reset-db")
+async def reset_database():
+    """
+    Drop and recreate all database tables.
+    
+    WARNING: This will delete ALL data! Use with caution.
+    """
+    try:
+        logger.info("Starting database reset - DROPPING ALL TABLES...")
+        
+        # Drop all tables
+        Base.metadata.drop_all(bind=engine)
+        logger.info("All tables dropped successfully")
+        
+        # Create all tables fresh
+        Base.metadata.create_all(bind=engine)
+        logger.info("All tables recreated successfully")
+        
+        # Verify tables were created
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+        logger.info(f"Tables after reset: {tables}")
+        
+        return {
+            "success": True,
+            "message": "Database reset successfully - all tables dropped and recreated",
+            "tables": tables
+        }
+        
+    except Exception as e:
+        logger.error(f"Error resetting database: {e}")
+        raise HTTPException(status_code=500, detail=f"Database reset failed: {str(e)}")
+
+
 @router.post("/init-db")
 async def initialize_database():
     """
