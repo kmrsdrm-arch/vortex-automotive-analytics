@@ -12,14 +12,17 @@ from src.database.repositories.sales_repo import SalesRepository
 from src.database.repositories.inventory_repo import InventoryRepository
 from src.data_generation.synthetic_data import SyntheticDataGenerator
 from src.data_generation.seeder import DatabaseSeeder
-# Import all models FIRST to register them with Base.metadata
+from config.logging_config import logger
+from config.database import engine
+
+# Import Base FIRST
+from src.database.models.base import Base
+
+# Then import ALL models to register them
 from src.database.models.vehicle import Vehicle
 from src.database.models.inventory import Inventory
 from src.database.models.sales import Sales
 from src.database.models.analytics import AnalyticsSnapshot, InsightHistory
-from src.database.models import Base
-from config.logging_config import logger
-from config.database import engine
 
 router = APIRouter(prefix="/api/v1/data", tags=["Data"])
 
